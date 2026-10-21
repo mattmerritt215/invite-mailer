@@ -7,11 +7,11 @@ workers_dev = true
 # routes = [{ pattern = "invite-mailer.fagmob.lol", custom_domain = true }]
 
 [vars]
+# authentik instance used for API calls. Invite links use each brand's own
+# authUrl from src/brands.js instead.
 AUTHENTIK_URL = "https://auth.fagmob.lol"
-ENROLLMENT_FLOW_SLUG = "fagmob-enrollment"
-MAIL_FROM = "fagmob <auth@fagmob.lol>"
-BRAND_URL = "https://fagmob.lol/"
-LOGO_URL = "https://fagmob.lol/brand/email-wordmark.png"
+# Brand (key in src/brands.js) for invitations that aren't bound to a flow.
+DEFAULT_BRAND = "fagmob"
 
 # Secrets, set with `npx wrangler secret put <NAME>`:
 #   WEBHOOK_SECRET   = same value as FAGMOB_MAILER_SECRET in authentik's .env
