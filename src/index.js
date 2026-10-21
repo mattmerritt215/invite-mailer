@@ -146,6 +146,15 @@ function renderInvite({ link, email, name, expires, brand }) {
   return { subject: title, html, text };
 }
 
+// A brand-specific secret (RESEND_API_KEY_<BRAND KEY>, e.g. RESEND_API_KEY_FAGMOB)
+// wins over the shared RESEND_API_KEY, so each domain can have its own key.
+function resendKeyFor(env, brand) {
+  const name = `RESEND_API_KEY_${brand.key.toUpperCase().replace(/[^A-Z0-9]/g, "_")}`;
+  const key = env[name] || env.RESEND_API_KEY;
+  if (!key) throw new Error(`no Resend API key: set ${name} or RESEND_API_KEY`);
+  return key;
+}
+
 async function getInvitation(env, pk) {
   const res = await fetch(`${trimSlash(env.AUTHENTIK_URL)}/api/v3/stages/invitation/invitations/${encodeURIComponent(pk)}/`, {
     headers: {
@@ -160,11 +169,11 @@ async function getInvitation(env, pk) {
   return res.json();
 }
 
-async function sendEmail(env, { from, to, subject, html, text, brandKey, idempotencyKey }) {
+async function sendEmail({ apiKey, from, to, subject, html, text, brandKey, idempotencyKey }) {
   const res = await fetch(RESEND_ENDPOINT, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "Idempotency-Key": idempotencyKey,
     },
@@ -242,7 +251,8 @@ export default {
         brand,
       });
 
-      const id = await sendEmail(env, {
+      const id = await sendEmail({
+        apiKey: resendKeyFor(env, brand),
         from: brand.from,
         to: email,
         ...message,

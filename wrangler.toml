@@ -16,7 +16,9 @@ DEFAULT_BRAND = "fagmob"
 # Secrets, set with `npx wrangler secret put <NAME>`:
 #   WEBHOOK_SECRET   = same value as FAGMOB_MAILER_SECRET in authentik's .env
 #   AUTHENTIK_TOKEN  = API token of a service account with "Can view Invitation"
-#   RESEND_API_KEY   = Resend API key with sending access
+#   RESEND_API_KEY   = Resend API key with sending access, shared by all brands
+#   RESEND_API_KEY_<BRAND> (optional, e.g. RESEND_API_KEY_FAGMOB) = a key for
+#                      one brand's domain; overrides RESEND_API_KEY for that brand
 
 [observability]
 enabled = true
