@@ -1,0 +1,22 @@
+name = "fagmob-invite-mailer"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+workers_dev = true
+
+# Uncomment if fagmob.lol is on Cloudflare DNS and you want a stable hostname.
+# routes = [{ pattern = "invite-mailer.fagmob.lol", custom_domain = true }]
+
+[vars]
+AUTHENTIK_URL = "https://auth.fagmob.lol"
+ENROLLMENT_FLOW_SLUG = "fagmob-enrollment"
+MAIL_FROM = "fagmob <auth@fagmob.lol>"
+BRAND_URL = "https://fagmob.lol/"
+LOGO_URL = "https://fagmob.lol/brand/email-wordmark.png"
+
+# Secrets, set with `npx wrangler secret put <NAME>`:
+#   WEBHOOK_SECRET   = same value as FAGMOB_MAILER_SECRET in authentik's .env
+#   AUTHENTIK_TOKEN  = API token of a service account with "Can view Invitation"
+#   RESEND_API_KEY   = Resend API key with sending access
+
+[observability]
+enabled = true
