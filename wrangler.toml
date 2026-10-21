@@ -1,9 +1,9 @@
-name = "fagmob-invite-mailer"
+name = "invite-mailer"
 main = "src/index.js"
 compatibility_date = "2026-08-01"
 workers_dev = true
 
-# Uncomment if fagmob.lol is on Cloudflare DNS and you want a stable hostname.
+# Uncomment to serve the worker from a stable hostname on a Cloudflare DNS zone.
 # routes = [{ pattern = "invite-mailer.fagmob.lol", custom_domain = true }]
 
 [vars]
