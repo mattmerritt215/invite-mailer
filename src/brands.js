@@ -4,6 +4,11 @@
 // authUrl is the brand's authentik domain. authentik picks the brand from the
 // request host, so the invite link has to use it rather than AUTHENTIK_URL.
 // The domain in `from` must be verified in Resend.
+//
+// resendKey (optional) is the NAME of a Worker secret holding this brand's
+// Resend API key, e.g. resendKey: "FAGMOB_RESEND_KEY" with the value set by
+// `npx wrangler secret put FAGMOB_RESEND_KEY`. Never put the key itself here:
+// this file is committed. Without resendKey the shared RESEND_API_KEY is used.
 
 export const BRANDS = {
   fagmob: {

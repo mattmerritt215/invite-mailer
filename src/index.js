@@ -146,12 +146,12 @@ function renderInvite({ link, email, name, expires, brand }) {
   return { subject: title, html, text };
 }
 
-// A brand-specific secret (RESEND_API_KEY_<BRAND KEY>, e.g. RESEND_API_KEY_FAGMOB)
-// wins over the shared RESEND_API_KEY, so each domain can have its own key.
+// brand.resendKey names the Worker secret holding that brand's Resend key.
+// Brands without one use the shared RESEND_API_KEY.
 function resendKeyFor(env, brand) {
-  const name = `RESEND_API_KEY_${brand.key.toUpperCase().replace(/[^A-Z0-9]/g, "_")}`;
-  const key = env[name] || env.RESEND_API_KEY;
-  if (!key) throw new Error(`no Resend API key: set ${name} or RESEND_API_KEY`);
+  const name = brand.resendKey || "RESEND_API_KEY";
+  const key = env[name];
+  if (!key) throw new Error(`no Resend API key for brand ${brand.key}: secret ${name} is not set`);
   return key;
 }
 
