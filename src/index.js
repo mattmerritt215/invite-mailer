@@ -227,12 +227,16 @@ export default {
       model.model_name !== "invitation" ||
       !model.pk
     ) {
+      console.warn(`not an invitation creation, not sending: action=${JSON.stringify(payload.action)} model=${JSON.stringify(model)}`);
       return json({ skipped: "not an invitation creation" }, 202);
     }
 
     try {
       const invite = await getInvitation(env, model.pk, requestedBrand);
-      if (!invite) return json({ skipped: "invitation no longer exists" }, 202);
+      if (!invite) {
+        console.warn(`invitation ${model.pk} not found via ${requestedBrand.authUrl} (404), not sending`);
+        return json({ skipped: "invitation no longer exists" }, 202);
+      }
 
       const fixed = invite.fixed_data ?? {};
       const email = String(fixed.email ?? "").trim();
