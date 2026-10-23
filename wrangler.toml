@@ -3,23 +3,26 @@ main = "src/index.js"
 compatibility_date = "2026-08-01"
 workers_dev = true
 
-# Uncomment to serve the worker from a stable hostname on a Cloudflare DNS zone.
-# routes = [{ pattern = "invite-mailer.fagmob.lol", custom_domain = true }]
-
-[vars]
-# authentik instance used for API calls. Invite links use each brand's own
-# authUrl from src/brands.js instead.
-AUTHENTIK_URL = "https://auth.fagmob.lol"
-# Brand (key in src/brands.js) for invitations that aren't bound to a flow.
-DEFAULT_BRAND = "fagmob"
+# One hostname per brand. The request hostname selects the brand, matched
+# against each brand's mailerHost in src/brands/*.json.
+routes = [
+  { pattern = "invites.fagmob.lol", custom_domain = true },
+  { pattern = "invites.113wolfstreet.online", custom_domain = true },
+]
 
 # Secrets, set with `npx wrangler secret put <NAME>`:
 #   WEBHOOK_SECRET   = same value as FAGMOB_MAILER_SECRET in authentik's .env
 #   AUTHENTIK_TOKEN  = API token of a service account with "Can view Invitation"
 #   RESEND_API_KEY   = Resend API key with sending access, used by brands
-#                      without a resendKey in src/brands.js
+#                      without a resendKey in src/brands/<brand>.json
 #   <resendKey name>  = one per brand that sets resendKey, holding that
 #                      brand's Resend API key
+
+# Email images for brands without their own public site to host them, served
+# from this worker at /brand/<brand>/... (anything else falls through to the
+# worker). Email clients don't render SVG, so these are PNGs.
+[assets]
+directory = "./public"
 
 [observability]
 enabled = true

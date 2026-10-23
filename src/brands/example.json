@@ -1,0 +1,28 @@
+{
+  "name": "example",
+  "mailerHost": "invites.example.com",
+  "flows": ["replace-with-enrollment-flow-slug"],
+  "authUrl": "https://auth.example.com",
+  "from": "Example <auth@example.com>",
+  "siteUrl": "https://example.com/",
+  "siteLabel": "example.com",
+  "logo": { "url": "https://example.com/email-logo.png", "width": 160 },
+  "copy": {
+    "subject": "You're invited to Example",
+    "preheader": "Set up your Example account."
+  },
+  "theme": {
+    "colorScheme": "light",
+    "font": "Arial,Helvetica,sans-serif",
+    "background": "#f4f4f5",
+    "card": "#ffffff",
+    "cardBorder": "#e4e4e7",
+    "text": "#27272a",
+    "muted": "#71717a",
+    "heading": "#18181b",
+    "button": "#4f46e5",
+    "buttonText": "#ffffff",
+    "link": "#4338ca",
+    "logoFallback": "#4f46e5"
+  }
+}

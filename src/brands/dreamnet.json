@@ -1,0 +1,32 @@
+{
+  "name": "dreamnet",
+  "mailerHost": "invites.113wolfstreet.online",
+  "flows": ["dreamnet-enrollment"],
+  "authUrl": "https://auth.113wolfstreet.online/",
+  "from": "dreamnet <auth@113wolfstreet.online>",
+  "resendKey": "DREAMNET_RESEND_KEY",
+  "siteUrl": "https://auth.113wolfstreet.online/",
+  "siteLabel": "dreamnet",
+  "logo": {
+    "url": "https://invites.113wolfstreet.online/brand/dreamnet/email-logo.png",
+    "width": 200
+  },
+  "copy": {
+    "subject": "You're invited to dreamnet",
+    "preheader": "Set up your dreamnet account. Pick a password or sign in with email links."
+  },
+  "theme": {
+    "colorScheme": "light",
+    "font": "'Nunito','Segoe UI',Helvetica,Arial,sans-serif",
+    "background": "#efd3ec",
+    "card": "#fff8fc",
+    "cardBorder": "#f8e0eb",
+    "text": "#3a1f44",
+    "muted": "#6b5a73",
+    "heading": "#3a1f44",
+    "button": "#c4306f",
+    "buttonText": "#ffffff",
+    "link": "#6a49c9",
+    "logoFallback": "#c4306f"
+  }
+}

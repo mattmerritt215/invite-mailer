@@ -4,7 +4,7 @@
 // invitation's enrollment flow, and sends that brand's themed invite email
 // through Resend. Idempotent per invitation (Resend Idempotency-Key).
 
-import { brandByKey, brandForFlow } from "./brands.js";
+import { brandForFlow, brandForMailerHost } from "./brands.js";
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,16 +52,19 @@ function trimSlash(url) {
   return url.replace(/\/+$/, "");
 }
 
-// Picks the brand for an invitation. Invitations without a flow can be used
-// with any flow, so they fall back to DEFAULT_BRAND (and its first flow).
-function resolveBrand(invite, env) {
+// The webhook's brand identifies the Authentik host before the invitation is
+// fetched. The invitation flow remains authoritative for branded invitations.
+function resolveBrand(invite, requestedBrand) {
   const slug = invite.flow_obj?.slug;
   if (slug) {
     const brand = brandForFlow(slug);
-    return brand ? { brand, slug } : null;
+    if (!brand) return null;
+    if (brand.key !== requestedBrand.key) {
+      throw new Error(`webhook brand ${requestedBrand.key} does not match invitation flow brand ${brand.key}`);
+    }
+    return { brand, slug };
   }
-  const brand = brandByKey(env.DEFAULT_BRAND);
-  return brand ? { brand, slug: brand.flows[0] } : null;
+  return { brand: requestedBrand, slug: requestedBrand.flows[0] };
 }
 
 function renderInvite({ link, email, name, expires, brand }) {
@@ -155,8 +158,8 @@ function resendKeyFor(env, brand) {
   return key;
 }
 
-async function getInvitation(env, pk) {
-  const res = await fetch(`${trimSlash(env.AUTHENTIK_URL)}/api/v3/stages/invitation/invitations/${encodeURIComponent(pk)}/`, {
+async function getInvitation(env, pk, brand) {
+  const res = await fetch(`${trimSlash(brand.authUrl)}/api/v3/stages/invitation/invitations/${encodeURIComponent(pk)}/`, {
     headers: {
       Authorization: `Bearer ${env.AUTHENTIK_TOKEN}`,
       Accept: "application/json",
@@ -198,9 +201,13 @@ async function sendEmail({ apiKey, from, to, subject, html, text, brandKey, idem
 
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
+    const url = new URL(request.url);
+    const { pathname } = url;
     if (pathname !== "/authentik") return json({ error: "not found" }, 404);
     if (request.method !== "POST") return json({ error: "method not allowed" }, 405);
+
+    const requestedBrand = brandForMailerHost(url.hostname);
+    if (!requestedBrand) return json({ error: "unknown invite-mailer host" }, 404);
 
     let payload;
     try {
@@ -224,7 +231,7 @@ export default {
     }
 
     try {
-      const invite = await getInvitation(env, model.pk);
+      const invite = await getInvitation(env, model.pk, requestedBrand);
       if (!invite) return json({ skipped: "invitation no longer exists" }, 202);
 
       const fixed = invite.fixed_data ?? {};
@@ -234,7 +241,7 @@ export default {
         return json({ skipped: "no fixed_data.email" }, 202);
       }
 
-      const resolved = resolveBrand(invite, env);
+      const resolved = resolveBrand(invite, requestedBrand);
       if (!resolved) {
         const flow = invite.flow_obj?.slug ?? "(none)";
         console.warn(`invitation ${invite.pk} flow ${flow} matches no brand, not sending`);

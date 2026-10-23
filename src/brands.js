@@ -1,49 +1,24 @@
-// Brand registry. An invitation is matched to a brand by its enrollment flow
-// slug, so every flow listed here must belong to exactly one brand.
-//
-// authUrl is the brand's authentik domain. authentik picks the brand from the
-// request host, so the invite link has to use it rather than AUTHENTIK_URL.
-// The domain in `from` must be verified in Resend.
-//
-// resendKey (optional) is the NAME of a Worker secret holding this brand's
-// Resend API key, e.g. resendKey: "FAGMOB_RESEND_KEY" with the value set by
-// `npx wrangler secret put FAGMOB_RESEND_KEY`. Never put the key itself here:
-// this file is committed. Without resendKey the shared RESEND_API_KEY is used.
+// Brand registry. Keep each brand's settings in its own JSON file under ./brands/.
+// Add active brands to this map so invitations can be selected by flow slug
+// and invite-mailer hostname. The example brand is intentionally not registered.
+
+import fagmob from "./brands/fagmob.json";
+import dreamnet from "./brands/dreamnet.json";
 
 export const BRANDS = {
-  fagmob: {
-    name: "fagmob",
-    flows: ["fagmob-enrollment"],
-    authUrl: "https://auth.fagmob.lol",
-    from: "fagmob <auth@fagmob.lol>",
-    siteUrl: "https://fagmob.lol/",
-    siteLabel: "fagmob.lol",
-    logo: { url: "https://fagmob.lol/brand/email-wordmark.png", width: 148 },
-    copy: {
-      subject: "You're invited to fagmob",
-      preheader: "Set up your fagmob account. Pick a password or sign in with email links.",
-    },
-    theme: {
-      colorScheme: "dark",
-      font: "'Avenir Next','Segoe UI',Helvetica,Arial,sans-serif",
-      background: "#0d0612",
-      card: "#170b1f",
-      cardBorder: "#3a1846",
-      text: "#efe3f5",
-      muted: "#9d86a8",
-      heading: "#ff6ae3",
-      headingGlow: "rgba(255,43,214,0.55)",
-      button: "#ff2bd6",
-      buttonText: "#1a0214",
-      buttonGlow: "rgba(255,43,214,0.55)",
-      link: "#29e6ff",
-      logoFallback: "#ff2bd6",
-    },
-  },
+  fagmob,
+  dreamnet,
 };
 
 const BY_FLOW = new Map();
+const BY_MAILER_HOST = new Map();
 for (const [key, brand] of Object.entries(BRANDS)) {
+  const host = brand.mailerHost.toLowerCase();
+  if (BY_MAILER_HOST.has(host)) {
+    throw new Error(`mailer host "${host}" is mapped to both ${BY_MAILER_HOST.get(host).key} and ${key}`);
+  }
+  BY_MAILER_HOST.set(host, { key, ...brand });
+
   for (const slug of brand.flows) {
     if (BY_FLOW.has(slug)) {
       throw new Error(`flow "${slug}" is mapped to both ${BY_FLOW.get(slug).key} and ${key}`);
@@ -56,6 +31,6 @@ export function brandForFlow(slug) {
   return BY_FLOW.get(slug) ?? null;
 }
 
-export function brandByKey(key) {
-  return key && BRANDS[key] ? { key, ...BRANDS[key] } : null;
+export function brandForMailerHost(host) {
+  return BY_MAILER_HOST.get(String(host ?? "").toLowerCase()) ?? null;
 }
