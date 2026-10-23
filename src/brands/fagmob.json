@@ -1,7 +1,7 @@
 {
   "name": "fagmob",
   "mailerHost": "invites.fagmob.lol",
-  "flows": ["fagmob-enrollment"],
+  "flows": ["fagmob-enroll"],
   "authUrl": "https://auth.fagmob.lol",
   "from": "fagmob <auth@fagmob.lol>",
   "resendKey": "FAGMOB_RESEND_KEY",

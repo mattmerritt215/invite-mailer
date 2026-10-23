@@ -1,7 +1,7 @@
 {
   "name": "dreamnet",
   "mailerHost": "invites.113wolfstreet.online",
-  "flows": ["dreamnet-enrollment"],
+  "flows": ["dreamnet-enroll"],
   "authUrl": "https://auth.113wolfstreet.online/",
   "from": "dreamnet <auth@113wolfstreet.online>",
   "resendKey": "DREAMNET_RESEND_KEY",
